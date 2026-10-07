@@ -10,55 +10,76 @@ class ProfilSekolahController extends Controller
 {
     public function index()
     {
+        // Mengambil data profil sekolah pertama (id = 1)
         $profil = ProfilSekolah::first();
+
         return view('admin.profil-sekolah.index', compact('profil'));
     }
 
     public function save(Request $request)
-{
-    // Validasi input
-    $request->validate([
-        'nama_sekolah'   => 'required',
-        'kepala_sekolah' => 'required',
-        'npsn'           => 'required',
-        'no_telepon'     => 'required', // input dari form (name="no_telepon")
-        'tahun_berdiri'  => 'required',
-        'alamat'         => 'required',
-        // ...
-    ]);
+    {
+        // Validasi input dari form
+        $request->validate([
+            'nama_sekolah'   => 'required|string|max:255',
+            'kepala_sekolah' => 'required|string|max:255',
+            'npsn'           => 'required|string|max:50',
+            'telepon'        => 'required|string|max:50',
+            'tahun_berdiri'  => 'required|string|max:10',
+            'alamat'         => 'required|string',
+            'deskripsi'      => 'nullable|string',
+            'visi'           => 'nullable|string',
+            'misi'           => 'nullable|string',
+            'logo'           => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'foto_gedung'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
 
-    $profil = ProfilSekolah::firstOrNew(['id' => 1]);
-
-    $profil->nama_sekolah   = $request->nama_sekolah;
-    $profil->kepala_sekolah = $request->kepala_sekolah;
-    $profil->npsn           = $request->npsn;
-    
-    // SESUAIKAN DI SINI: Simpan nilai dari form ($request->no_telepon) ke kolom 'kontak'
-    $profil->kontak         = $request->no_telepon; 
-    
-    $profil->tahun_berdiri  = $request->tahun_berdiri;
-    $profil->alamat         = $request->alamat;
-    $profil->deskripsi      = $request->deskripsi;
-
-    // Upload Logo jika ada
-    if ($request->hasFile('logo')) {
-        if ($profil->logo) {
-            Storage::disk('public')->delete($profil->logo);
+        // Ambil data profil pertama atau buat objek baru jika belum ada
+        $profil = ProfilSekolah::first();
+        if (!$profil) {
+            $profil = new ProfilSekolah();
         }
-        $profil->logo = $request->file('logo')->store('profil', 'public');
-    }
 
-    // Upload Foto Gedung jika ada
-    if ($request->hasFile('foto_gedung')) {
-        if ($profil->foto_gedung) {
-            Storage::disk('public')->delete($profil->foto_gedung);
+        // Simpan field biasa ke kolom yang sesuai di database
+        $profil->nama_sekolah   = $request->nama_sekolah;
+        $profil->kepala_sekolah = $request->kepala_sekolah;
+        $profil->npsn           = $request->npsn;
+        $profil->kontak         = $request->telepon; // Di DB nama kolomnya 'kontak'
+        $profil->tahun_berdiri  = $request->tahun_berdiri;
+        $profil->alamat         = $request->alamat;
+        $profil->deskripsi      = $request->deskripsi;
+
+        // Menggabungkan Visi & Misi ke kolom 'visi_misi' di database
+        $visiMisiText = "";
+        if ($request->filled('visi')) {
+            $visiMisiText .= "Visi:\n" . $request->visi;
         }
-        $profil->foto_gedung = $request->file('foto_gedung')->store('profil', 'public');
+        if ($request->filled('misi')) {
+            if (!empty($visiMisiText)) {
+                $visiMisiText .= "\n\n";
+            }
+            $visiMisiText .= "Misi:\n" . $request->misi;
+        }
+        $profil->visi_misi = $visiMisiText;
+
+        // Upload Foto Gedung (Di DB nama kolomnya 'foto')
+        if ($request->hasFile('foto_gedung')) {
+            if (!empty($profil->foto) && Storage::disk('public')->exists($profil->foto)) {
+                Storage::disk('public')->delete($profil->foto);
+            }
+            $profil->foto = $request->file('foto_gedung')->store('profil', 'public');
+        }
+
+        // Upload Logo
+        if ($request->hasFile('logo')) {
+            if (!empty($profil->logo) && Storage::disk('public')->exists($profil->logo)) {
+                Storage::disk('public')->delete($profil->logo);
+            }
+            $profil->logo = $request->file('logo')->store('profil', 'public');
+        }
+
+        // Simpan perubahan ke database
+        $profil->save();
+
+        return redirect()->back()->with('success', 'Profil Sekolah berhasil diperbarui!');
     }
-
-    $profil->save();
-
-    return redirect()->back()->with('success', 'Profil Sekolah berhasil diperbarui!');
-}
-
 }

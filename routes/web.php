@@ -12,10 +12,8 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Halaman Utama / Landing Page
-Route::get('/', function () {
-    return view('landing');
-});
+// Halaman Utama / Landing Page (Ubah baris ini)
+Route::get('/', [HomeController::class, 'index']);
 
 // Autentikasi (Diberi nama 'login' agar route('login') di landing page berfungsi)
 Route::get('/admin/login', [AuthController::class, 'index'])->name('login');

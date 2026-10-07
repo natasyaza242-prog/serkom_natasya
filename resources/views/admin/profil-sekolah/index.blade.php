@@ -37,10 +37,10 @@
                     <input type="text" name="npsn" value="{{ old('npsn', $profil->npsn ?? '') }}" required class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
                 </div>
 
-                {{-- Nomor Telepon --}}
+                {{-- Nomor Telepon / Kontak --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nomor Telepon / Kontak *</label>
-                    <input type="text" name="telepon" value="{{ old('telepon', $profil->telepon ?? '') }}" required class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
+                    <input type="text" name="telepon" value="{{ old('telepon', $profil->kontak ?? '') }}" required class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
                 </div>
 
                 {{-- Tahun Berdiri --}}
@@ -55,10 +55,10 @@
                     <textarea name="alamat" rows="3" required class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">{{ old('alamat', $profil->alamat ?? '') }}</textarea>
                 </div>
 
-                {{-- Deskripsi --}}
+                {{-- Deskripsi / Sambutan Sekolah --}}
                 <div class="md:col-span-2">
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Deskripsi / Sambutan Sekolah</label>
-                    <textarea name="deskripsi" rows="4" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">{{ old('deskripsi', $profil->deskripsi ?? '') }}</textarea>
+                    <textarea name="deskripsi" rows="3" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">{{ old('deskripsi', $profil->deskripsi ?? '') }}</textarea>
                 </div>
             </div>
 
